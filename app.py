@@ -1,13 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 import google.generativeai as genai
 import os
 
 app = Flask(__name__)
 
-# Load service account credentials from JSON
-genai.configure(
-    credentials="bamboo-striker-299906-b9fa76a9324e.json"
-)
+# Configure Gemini API
+genai.configure(credentials="bamboo-striker-299906-b9fa76a9324e.json")
 
 @app.route("/ask", methods=["POST"])
 def ask_gemini():
@@ -15,14 +13,12 @@ def ask_gemini():
     try:
         model = genai.GenerativeModel("gemini-pro")
         response = model.generate_content(user_prompt)
-        return jsonify({"reply": response.text})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        reply = response.text
 
-# ✅ Add this health check route
-@app.route("/")
-def health():
-    return jsonify({"status": "ok"}), 200
+        # Force proper JSON response
+        return make_response(jsonify({"reply": reply}), 200)
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
 
 if __name__ == "__main__":
     app.run(debug=True)
