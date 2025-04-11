@@ -19,5 +19,10 @@ def ask_gemini():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# ✅ Add this health check route
+@app.route("/")
+def health():
+    return jsonify({"status": "ok"}), 200
+
 if __name__ == "__main__":
     app.run(debug=True)
